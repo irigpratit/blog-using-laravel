@@ -15,6 +15,10 @@ class PostsController extends Controller
         $this->middleware('auth',['except'=>['index','show']]);
     }
 
+    public function getPostList(){
+        
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -27,8 +31,16 @@ class PostsController extends Controller
         //using the SQL Querry
 
         // $posts=DB::select('SELECT*FROM posts');
+        
         $posts=Post::orderBy('created_at','desc')->get();
         return view('posts.index')->with('posts',$posts);
+
+        // //$data = array();
+        // $data = [];
+
+        // $data['posts'] = Post::select('title','body')
+        //                     ->orderBy('created_at','desc')->get();       
+        // return view('posts.index',compact('data'));
     }
 
     /**
@@ -52,8 +64,9 @@ class PostsController extends Controller
         $this->validate($request,[
             'title'=>'required',
             'body'=>'required',
-            'cover_image'=>'image|nullable|max:1999'
+            'cover_image'=>'image|nullable|max:2048'
         ]);
+
         //handle uploaded file
         if($request->hasFile('cover_image')){
             //get filename with extension
@@ -65,7 +78,7 @@ class PostsController extends Controller
             //filename to store
             $fileNameToStore= $filename.'_'.time().'.'.$extension;
             //upload image
-            $path = $request->file('covar_image')->storeAs('public/cover_images',$fileNameToStore);
+            $path = $request->file('cover_image')->storeAs('public/cover_images',$fileNameToStore);
         }else{
             $fileNameToStore='noimage.jpg';
         }
@@ -74,9 +87,10 @@ class PostsController extends Controller
         $post=new Post;
         $post->title=$request->input('title');
         $post->body=$request->input('body');
-        $post->user_id=auth()->user()->id;
+        $post->user_id= auth()->user()->id;
         $post->cover_image=$fileNameToStore;
         $post->save();
+        // $user->post->save(); 
 
         return redirect('/posts')->with('success', 'Post Created');
     }

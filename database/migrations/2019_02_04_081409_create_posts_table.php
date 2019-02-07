@@ -17,6 +17,7 @@ class CreatePostsTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->longText('body');
+            // $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }
